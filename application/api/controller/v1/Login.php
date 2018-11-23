@@ -9,8 +9,10 @@
 namespace app\api\controller\v1;
 
 
+use app\common\lib\ali\demo\AliSms;
 use app\common\lib\exception\BasicException;
 use app\common\model\User;
+use think\Log;
 use think\Request;
 use think\Cache;
 
@@ -32,6 +34,14 @@ class Login extends Common
 
 
         // todo 发送短信
+        $sms = new AliSms();
+        $content = $sms->sendSms($phone, $code);
+        $content = json_decode(json_encode($content), true);
+        // 发送失败
+        if ($content['Code'] != 'OK') {
+            Log::error(implode(',', $content));
+            throw new BasicException();
+        }
 
         return show([]);
     }
